@@ -3,16 +3,20 @@ const cors = require("cors");
 require("dotenv").config();
 
 const { connectDB } = require("./config/db");
-
 const booksRoutes = require("./routes/books");
 const borrowsRoutes = require("./routes/borrows");
 
 const app = express();
 
 // Middleware
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://booknook-client-nine-xi.vercel.app",
+];
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: allowedOrigins,
     credentials: true,
   })
 );
@@ -20,7 +24,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// API routes — AFTER express.json()
+// API routes
 app.use("/books", booksRoutes);
 app.use("/borrows", borrowsRoutes);
 
@@ -41,7 +45,6 @@ app.get("/api/health", (req, res) => {
 async function startServer() {
   try {
     const db = await connectDB();
-
     app.locals.db = db;
 
     const PORT = process.env.PORT || 5000;
