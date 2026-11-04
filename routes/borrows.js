@@ -53,6 +53,16 @@ if (
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
     }
+    const existingBorrow = await db.collection("borrows").findOne({
+  bookId: new ObjectId(bookId),
+  userEmail: userEmail.toLowerCase(),
+});
+
+if (existingBorrow) {
+  return res.status(409).json({
+    message: "You have already borrowed this book",
+  });
+}
 
     const newBorrow = {
       bookId: new ObjectId(bookId),
