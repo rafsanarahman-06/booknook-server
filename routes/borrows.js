@@ -33,6 +33,18 @@ router.post("/", async (req, res) => {
     if (!ObjectId.isValid(bookId)) {
       return res.status(400).json({ message: "Invalid book ID" });
     }
+    const parsedBorrowDate = new Date(borrowDate);
+const parsedReturnDate = new Date(returnDate);
+
+if (
+  Number.isNaN(parsedBorrowDate.getTime()) ||
+  Number.isNaN(parsedReturnDate.getTime()) ||
+  parsedReturnDate <= parsedBorrowDate
+) {
+  return res.status(400).json({
+    message: "Please provide valid borrowing and return dates",
+  });
+}
 
     const book = await db.collection("books").findOne({
       _id: new ObjectId(bookId),
@@ -47,8 +59,8 @@ router.post("/", async (req, res) => {
       bookTitle,
       bookImage,
       userEmail: userEmail.toLowerCase(),
-      borrowDate: new Date(borrowDate),
-      returnDate: new Date(returnDate),
+      borrowDate:  parsedBorrowDate,
+      returnDate: parsedReturnDate,
       createdAt: new Date(),
     };
 
